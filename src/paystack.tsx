@@ -25,6 +25,7 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
     autoStart = false,
     onSuccess,
     activityIndicatorColor = 'green',
+    metaData = {}
   },
   ref,
 ) => {
@@ -54,6 +55,8 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
   const refNumberString = refNumber ? `ref: '${refNumber}',` : ''; // should only send ref number if present, else if blank, paystack will auto-generate one
   
   const subAccountString = subaccount ? `subaccount: '${subaccount}',` : ''; // should only send subaccount with the correct subaccoount_code if you want to enable split payment on transaction
+
+  const metaDataString = JSON.stringify(metaData);
 
   const Paystackcontent = `   
       <!DOCTYPE html>
@@ -86,11 +89,13 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
                         {
                         display_name:  '${firstName + ' ' + lastName}',
                         variable_name:  '${billingName}',
-                        value:''
+                        value:'',
+                        ...${metaDataString}
                         }
                 ]},
                 onSuccess: function(response){
                       var resp = {event:'successful', transactionRef:response};
+                      console.log(JSON.stringify(resp,0,2),"response")
                         window.ReactNativeWebView.postMessage(JSON.stringify(resp))
                 },
                 onCancel: function(){
